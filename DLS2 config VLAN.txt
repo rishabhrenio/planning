@@ -1,0 +1,107 @@
+DLS2
+
+Switch>en
+Switch#conf t
+Switch(config)#hostname DLS2
+DLS2(config)#interface loopback 1
+DLS2(config-if)#ip address 192.168.1.1 255.255.255.0
+DLS2(config-if)#exit
+
+DLS2(config)#interface vlan 110
+DLS2(config-if)#ip address 10.1.110.1 255.255.255.0
+DLS2(config-if)#no shutdown
+DLS2(config-if)#exit
+
+DLS2(config)#interface vlan 120 
+DLS2(config-if)#ip address 10.1.120.1 255.255.255.0
+DLS2(config-if)#no shutdown
+DLS2(config-if)#exit
+
+Implement a Layer 3 EtherChannel
+
+DLS2(config)#interface range e0/2-3
+
+DLS2(config-if-range)#no switchport
+DLS2(config-if-range)#no ip
+DLS2(config-if-range)#no ip address
+DLS2(config-if-range)#channel-group 2 mode on
+
+Creating a port-channel interface Port-channel 2
+
+DLS2(config-if-range)#exit
+
+DLS2(config)#interface port-channel 2
+
+DLS2(config-if)#ip address 172.16.12.2 255.255.255.252
+DLS2(config-if)#end
+
+DLS2(config)#interface range e0/0-1
+
+DLS2(config-if-range)#switchport trunk encapsulation dot1q
+DLS2(config-if-range)#switchport mode trunk
+DLS2(config-if-range)#channel-group 3 mode desirable
+
+Creating a port-channel interface Port-channel 3
+
+DLS2(config-if-range)#exit
+
+DLS2(config)#interface range e1/0-1 
+
+DLS2(config-if-range)#switchport trunk encapsulation dot1q
+DLS2(config-if-range)#switchport mode trunk 
+DLS2(config-if-range)#channel-group 4 mode desirable 
+
+Creating a port-channel interface Port-channel 4
+DLS2(config-if-range)#end
+
+DLS2#sh interfaces trunk
+
+Port Mode Encapsulation Status Native vlan
+Po3 on 802.1q trunking 1
+Po4 on 802.1q trunking 1
+Port Vlans allowed on trunk
+Po3 1-4094
+Po4 1-4094
+Port Vlans allowed and active in management domain
+Po3 1,110,120
+Po4 1,110,120
+Port Vlans in spanning tree forwarding state and not pruned
+Po3 1,110,120
+Po4 1,110,120
+Implement Static Routing
+
+DLS2(config)#ip routing
+
+DLS2(config)#ip route 172.16.1.0 255.255.255.252 172.16.12.1 
+DLS2(config)# ip route 172.16.1.0 255.255.255.0 10.1.99.1
+
+Configure the host ports for the appropriate VLANs according to the diagram
+
+DLS2(config)#interface e1/2
+DLS2(config-if)#switchport mode access
+DLS2(config-if)#switchport access vlan 110
+
+DLS2#sh ip route
+
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+ D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+ N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+ E1 - OSPF external type 1, E2 - OSPF external type 2
+ i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+ ia - IS-IS inter area, * - candidate default, U - per-user static route
+ o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+ a - application route
+ + - replicated route, % - next hop override
+Gateway of last resort is not set
+ 10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
+C 10.1.110.0/24 is directly connected, Vlan110
+L 10.1.110.1/32 is directly connected, Vlan110
+C 10.1.120.0/24 is directly connected, Vlan120
+L 10.1.120.1/32 is directly connected, Vlan120
+ 172.16.0.0/16 is variably subnetted, 3 subnets, 2 masks
+S 172.16.1.0/30 [1/0] via 172.16.12.1
+C 172.16.12.0/30 is directly connected, Port-channel2
+L 172.16.12.2/32 is directly connected, Port-channel2
+ 192.168.1.0/24 is variably subnetted, 2 subnets, 2 masks
+C 192.168.1.0/24 is directly connected, Loopback1
+L 192.168.1.1/32 is directly connected, Loopback1

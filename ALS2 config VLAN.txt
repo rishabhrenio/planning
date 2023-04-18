@@ -1,0 +1,51 @@
+ALS2
+
+Switch>en
+Switch#conf t
+Switch(config)#hostname ALS2
+ALS2(config)#ip default-gateway 10.1.120.1
+
+Implement a Layer 3 EtherChannel
+
+ALS2(config)#int range e0/0-1
+
+ALS2(config-if-range)#switchport trunk encapsulation dot1q
+ALS2(config-if-range)#switchport mode trunk
+ALS2(config-if-range)#channel-group 3 mode desirable
+
+Creating a port-channel interface Port-channel 3
+
+ALS2(config-if-range)#end
+
+ALS2#sh etherchannel summary
+
+Flags: D - down P - bundled in port-channel
+ I - stand-alone s - suspended
+ H - Hot-standby (LACP only)
+ R - Layer3 S - Layer2
+ U - in use N - not in use, no aggregation
+ f - failed to allocate aggregator
+ M - not in use, minimum links not met
+ m - not in use, port not aggregated due to minimum links not met
+ u - unsuitable for bundling
+ w - waiting to be aggregated
+ d - default port
+ A - formed by Auto LAG
+Number of channel-groups in use: 1
+Number of aggregators: 1
+Group Port-channel Protocol Ports
+------+-------------+-----------+-----------------------------------------------
+3 Po3(SU) PAgP Et0/0(P) Et0/1(P) 
+Configure the host ports for the appropriate VLANs according to the diagram
+
+ALS2(config)#interface e0/2
+
+ALS2(config-if)#switchport mode access
+ALS2(config-if)#switchport access vlan 120
+
+HOST A
+VPCS> ip 10.1.100.1 255.255.255.0 10.1.100.2
+HOST B
+VPCS> ip 10.1.120.2 255.255.255.0 10.1.120.1
+HOST D
+VPCS> ip 10.1.110.2 255.255.255.0 10.1.110.1

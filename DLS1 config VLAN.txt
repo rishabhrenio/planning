@@ -1,0 +1,79 @@
+DLS1
+
+Switch>enable
+Switch#conf t
+Switch(config)#hostname DLS1
+DLS1(config)#interface loopback 1
+DLS1(config-if)#ip address 172.16.1.1 255.255.255.0
+DLS1(config-if)#exit
+
+DLS1(config)#interface vlan 99
+DLS1(config-if)#ip address 10.1.99.1 255.255.255.0
+DLS1(config-if)#no shutdown
+
+Implement a Layer 3 EtherChannel
+
+DLS1(config)#int range e0/2-3
+DLS1(config-if-range)#no switchport
+DLS1(config-if-range)#no ip address
+DLS1(config-if-range)#channel-group 2 mode on
+
+Creating a port-channel interface Port-channel 2
+
+DLS1(config-if-range)#exit
+
+DLS1(config)#interface port-channel 2
+
+DLS1(config-if)#ip address 172.16.12.1 255.255.255.252
+DLS1(config-if)#end
+
+DLS1(config)#int range e0/0-1 
+
+DLS1(config-if-range)#switchport trunk encapsulation dot1q
+DLS1(config-if-range)#switchport mode trunk 
+DLS1(config-if-range)#channel-group 1 mode desirable
+
+Creating a port-channel interface Port-channel 1
+
+DLS1(config-if-range)#end
+
+DLS1#sh interfaces trunk
+
+Port Mode Encapsulation Status Native vlan
+Po1 on 802.1q trunking 1
+Port Vlans allowed on trunk
+Po1 1-4094
+Port Vlans allowed and active in management domain
+Po1 1,99
+Port Vlans in spanning tree forwarding state and not pruned
+Po1 1,99
+Implement Static Routing
+
+DLS1(config)#ip routing
+DLS1(config)#ip route 192.168.1.0 255.255.255.252 172.16.12.2 
+DLS1(config)# ip route 192.168.1.0 255.255.255.0 10.1.120.1
+DLS1(config)# ip route 192.168.1.0 255.255.255.0 10.1.110.1
+
+DLS1#sh ip route
+
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+ D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+ N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+ E1 - OSPF external type 1, E2 - OSPF external type 2
+ i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+ ia - IS-IS inter area, * - candidate default, U - per-user static route
+ o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+ a - application route
+ + - replicated route, % - next hop override
+Gateway of last resort is not set
+ 10.0.0.0/8 is variably subnetted, 2 subnets, 2 masks
+C 10.1.99.0/24 is directly connected, Vlan99
+L 10.1.99.1/32 is directly connected, Vlan99
+ 172.16.0.0/16 is variably subnetted, 4 subnets, 3 masks
+C 172.16.1.0/24 is directly connected, Loopback1
+L 172.16.1.1/32 is directly connected, Loopback1
+C 172.16.12.0/30 is directly connected, Port-channel2
+L 172.16.12.1/32 is directly connected, Port-channel2
+ 192.168.1.0/30 is subnetted, 1 subnets
+S 192.168.1.0 [1/0] via 172.16.12.2
+
