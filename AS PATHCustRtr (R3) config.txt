@@ -1,0 +1,41 @@
+CustRtr (R3)
+
+Router>enable
+Router#conf t
+Router(config)#hostname CustRtr
+CustRtr(config)#interface Loopback0
+CustRtr(config-if)#ip address 10.3.3.1 255.255.255.0
+CustRtr(config-if)#exit
+
+CustRtr(config)#interface Serial1/0
+CustRtr(config-if)#ip address 172.24.1.18 255.255.255.252
+CustRtr(config-if)#no shutdown
+CustRtr(config-if)#end
+
+CustRtr(config)#router bgp 65000
+
+CustRtr(config-router)#network 10.3.3.0 mask 255.255.255.0
+CustRtr(config-router)#neighbor 172.24.1.17 remote-as 300
+CustRtr(config-router)#end
+
+CustRtr#sh ip route
+
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+ D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+ N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+ E1 - OSPF external type 1, E2 - OSPF external type 2
+ i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+ ia - IS-IS inter area, * - candidate default, U - per-user static route
+ o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+ a - application route
+ + - replicated route, % - next hop override
+Gateway of last resort is not set
+ 10.0.0.0/8 is variably subnetted, 3 subnets, 2 masks
+B 10.2.2.0/24 [20/0] via 172.24.1.17, 00:45:59
+C 10.3.3.0/24 is directly connected, Loopback0
+L 10.3.3.1/32 is directly connected, Loopback0
+ 172.24.0.0/16 is variably subnetted, 2 subnets, 2 masks
+C 172.24.1.16/30 is directly connected, Serial1/0
+L 172.24.1.18/32 is directly connected, Serial1/0
+
+

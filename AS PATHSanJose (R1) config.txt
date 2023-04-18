@@ -1,0 +1,66 @@
+SanJose (R1)
+
+Router>enable
+Router#conf t
+Router(config)#hostname SanJose
+SanJose(config)#interface Loopback0
+SanJose(config-if)#ip address 10.1.1.1 255.255.255.0
+SanJose(config-if)#exit
+
+SanJose(config)#interface Serial1/0
+SanJose(config-if)#ip address 192.168.1.5 255.255.255.252
+SanJose(config-if)#no shutdown
+SanJose(config-if)#end
+
+SanJose(config)#router bgp 100
+SanJose(config-router)#network 10.1.1.0 mask 255.255.255.0
+SanJose(config-router)#neighbor 192.168.1.6 remote-as 300
+SanJose(config-router)#exit
+
+SanJose#sh ip route
+
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+ D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+ N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+ E1 - OSPF external type 1, E2 - OSPF external type 2
+ i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+ ia - IS-IS inter area, * - candidate default, U - per-user static route
+ o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+ a - application route
+ + - replicated route, % - next hop override
+Gateway of last resort is not set
+ 10.0.0.0/8 is variably subnetted, 4 subnets, 2 masks
+C 10.1.1.0/24 is directly connected, Loopback0
+L 10.1.1.1/32 is directly connected, Loopback0
+B 10.2.2.0/24 [20/0] via 192.168.1.6, 00:05:47
+B 10.3.3.0/24 [20/0] via 192.168.1.6, 00:02:13
+ 192.168.1.0/24 is variably subnetted, 2 subnets, 2 masks
+C 192.168.1.4/30 is directly connected, Serial1/0
+L 192.168.1.5/32 is directly connected, Serial1/0
+
+SanJose#sh ip bgp 
+
+BGP table version is 4, local router ID is 10.1.1.1
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, 
+ r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter, 
+ x best-external, a additional-path, c RIB-compressed, 
+Origin codes: i - IGP, e - EGP, ? - incomplete
+RPKI validation codes: V valid, I invalid, N Not found
+ Network Next Hop Metric LocPrf Weight Path
+*> 10.1.1.0/24 0.0.0.0 0 32768 i
+*> 10.2.2.0/24 192.168.1.6 0 0 300 i
+*> 10.3.3.0/24 192.168.1.6 0 300 65000 i
+
+SanJose#sh ip bgp
+
+BGP table version is 5, local router ID is 10.1.1.1
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, 
+ r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter, 
+ x best-external, a additional-path, c RIB-compressed, 
+Origin codes: i - IGP, e - EGP, ? - incomplete
+RPKI validation codes: V valid, I invalid, N Not found
+ Network Next Hop Metric LocPrf Weight Path
+*> 10.1.1.0/24 0.0.0.0 0 32768 i
+*> 10.2.2.0/24 192.168.1.6 0 0 300 i
+*> 10.3.3.0/24 192.168.1.6 0 300 i
+
