@@ -1,0 +1,130 @@
+R1(ISP)
+
+Router>enable
+Router#conf t
+Router(config)#hostname ISP
+ISP(config)#interface Loopback0
+ISP(config-if)#ip address 192.168.100.1 255.255.255.0
+ISP(config-if)#exit
+
+ISP(config)#interface Serial1/0
+ISP(config-if)#ip address 192.168.1.5 255.255.255.252
+ISP(config-if)#no shutdown
+ISP(config-if)#exit
+
+ISP(config)#interface Serial1/1
+ISP(config-if)#ip address 192.168.1.1 255.255.255.252
+ISP(config-if)#no shutdown
+ISP(config-if)#exit
+
+ISP(config)#router bgp 200
+
+ISP(config-router)#network 192.168.100.0
+ISP(config-router)#neighbor 192.168.1.6 remote-as 64512
+ISP(config-router)#neighbor 192.168.1.2 remote-as 64512
+ISP(config-router)#exit
+
+ISP#sh ip bgp
+ 
+BGP table version is 3, local router ID is 192.168.100.1
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, 
+ r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter, 
+ x best-external, a additional-path, c RIB-compressed, 
+Origin codes: i - IGP, e - EGP, ? - incomplete
+RPKI validation codes: V valid, I invalid, N Not found
+ Network Next Hop Metric LocPrf Weight Path
+* 172.16.0.0 192.168.1.2 0 0 64512 i
+*> 192.168.1.6 0 0 64512 i
+*> 192.168.100.0 0.0.0.0 0 32768 i
+
+ISP#ping 172.16.1.1 source 192.168.100.1
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 172.16.1.1, timeout is 2 seconds:
+Packet sent with a source address of 192.168.100.1 
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 10/10/11 ms
+
+ISP#ping 172.16.32.1 source 192.168.100.1
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 172.16.32.1, timeout is 2 seconds:
+Packet sent with a source address of 192.168.100.1 
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 15/15/16 ms
+
+ISP#ping 172.16.1.2 source 192.168.100.1 
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 172.16.1.2, timeout is 2 seconds:
+Packet sent with a source address of 192.168.100.1 
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 15/17/25 ms
+
+ISP(config)#router bgp 200
+
+ISP(config-router)#network 192.168.1.0 mask 255.255.255.252
+ISP(config-router)#network 192.168.1.4 mask 255.255.255.252
+ISP(config-router)#exit
+
+ISP#sh ip bgp
+
+BGP table version is 5, local router ID is 192.168.100.1
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, 
+ r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter, 
+ x best-external, a additional-path, c RIB-compressed, 
+Origin codes: i - IGP, e - EGP, ? - incomplete
+RPKI validation codes: V valid, I invalid, N Not found
+ Network Next Hop Metric LocPrf Weight Path
+* 172.16.0.0 192.168.1.6 0 0 64512 i
+*> 192.168.1.2 0 0 64512 i
+*> 192.168.1.0/30 0.0.0.0 0 32768 i
+*> 192.168.1.4/30 0.0.0.0 0 32768 i
+*> 192.168.100.0 0.0.0.0 0 32768 i
+
+ISP#sh ip bgp
+
+BGP table version is 6, local router ID is 192.168.100.1
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, 
+ r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter, 
+ x best-external, a additional-path, c RIB-compressed, 
+Origin codes: i - IGP, e - EGP, ? - incomplete
+RPKI validation codes: V valid, I invalid, N Not found
+ Network Next Hop Metric LocPrf Weight Path
+*> 172.16.0.0 192.168.1.6 50 0 64512 i
+* 192.168.1.2 75 0 64512 i
+*> 192.168.1.0/30 0.0.0.0 0 32768 i
+*> 192.168.1.4/30 0.0.0.0 0 32768 i
+*> 192.168.100.0 0.0.0.0 0 32768 i
+
+ISP#ping 172.16.1.1
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 172.16.1.1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 9/10/11 ms
+
+ISP#ping 172.16.1.2
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 172.16.1.2, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 20/21/25 ms
+
+ISP#traceroute 172.16.1.1
+
+Type escape sequence to abort.
+Tracing the route to 172.16.1.1
+VRF info: (vrf in name/id, vrf out name/id)
+ 1 192.168.1.6 10 msec 10 msec *
+ 
+ISP#traceroute 172.16.1.2
+
+Type escape sequence to abort.
+Tracing the route to 172.16.1.2
+VRF info: (vrf in name/id, vrf out name/id)
+ 1 192.168.1.6 10 msec 10 msec 13 msec
+ 2 172.16.1.2 [AS 64512] 20 msec 19 msec *
+
+
+
