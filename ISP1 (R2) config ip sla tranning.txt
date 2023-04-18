@@ -1,0 +1,38 @@
+ISP1 (R2)
+
+Router>enable
+Router#conf t
+Router(config)#hostname ISP1
+ISP1(config)#interface Loopback0
+ISP1(config-if)#description Simulated Internet Web Server
+ISP1(config-if)#ip address 209.165.200.254 255.255.255.255
+ISP1(config-if)#exit
+
+ISP1(config)#interface Loopback1
+ISP1(config-if)#ip address 209.165.201.30 255.255.255.255
+ISP1(config-if)#exit
+
+ISP1(config)#interface s1/0
+ISP1(config-if)#ip address 209.165.201.1 255.255.255.252
+ISP1(config-if)#no shutdown
+ISP1(config-if)#exit
+
+ISP1(config)#interface s1/1 
+ISP1(config-if)#ip address 209.165.200.225 255.255.255.252
+ISP1(config-if)#no shutdown
+ISP1(config-if)#exit
+
+ISP1(config)#router eigrp 200
+ISP1(config-router)#network 209.165.200.224
+ISP1(config-router)#network 209.165.201.0
+ISP1(config-router)#no auto-summary
+ISP1(config-router)#exit
+
+ISP1(config)#ip route 192.168.1.0 255.255.255.0 209.165.201.2
+ISP1(config)#interface loopback 1
+ISP1(config-if)#shut
+
+ISP1(config)#interface loopback 1
+ISP1(config-if)#no shutdown
+
+
