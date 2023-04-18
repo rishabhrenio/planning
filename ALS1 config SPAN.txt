@@ -1,0 +1,71 @@
+ALS1
+
+Switch>en
+Switch#conf t
+Switch(config)#hostname ALS1
+ALS1(config)#interface vlan 1
+ALS1(config-if)#ip address 172.16.1.101 255.255.255.0
+ALS1(config-if)#no shutdown
+ALS1(config-if)#exit
+
+ALS1(config)#ip default-gateway 172.16.1.1
+
+Configure the trunks and EtherChannel between ALS1 and DLS1
+
+ALS1(config)#interface range e0/0-1
+
+ALS1(config-if-range)# switchport trunk encapsulation dot1q
+ALS1(config-if-range)#switchport mode trunk
+ALS1(config-if-range)#channel-group 1 mode desirable
+
+Creating a port-channel interface Port-channel 1
+
+ALS1(config-if-range)#exit
+
+Configure the trunks and EtherChannel between ALS1 and ALS2
+
+ALS1(config)#interface range e0/2-3 
+ALS1(config-if-range)#switchport trunk encapsulation dot1q 
+ALS1(config-if-range)#switchport mode trunk 
+ALS1(config-if-range)#channel-group 2 mode desirable 
+
+Creating a port-channel interface Port-channel 2
+Configure VTP on ALS1
+
+ALS1(config)#vtp mode client
+
+Setting device to VTP Client mode for VLANS.
+
+ALS1(config)#int e1/0
+ALS1(config-if)#switchport mode access
+ALS1(config-if)#switchport access vlan 100
+ALS1(config-if)#exit
+
+Configure Cisco IOS IP SLA responders.
+
+ALS1(config)#ip sla responder
+ALS1(config)#ip sla responder udp-echo ipaddress 172.16.1.1 port 5000
+
+ALS1#show ip sla responder
+
+ General IP SLA Responder on Control port 1967
+ General IP SLA Responder on Control V2 port 1167
+General IP SLA Responder is: Enabled
+Number of control message received: 16 Number of errors: 0 
+Recent sources:
+ 172.16.1.1 [14:23:36.259 EET Sat Apr 11 2020]
+ 172.16.1.1 [14:22:36.257 EET Sat Apr 11 2020]
+ 172.16.1.1 [14:21:36.255 EET Sat Apr 11 2020]
+ 172.16.1.1 [14:20:36.256 EET Sat Apr 11 2020]
+ 172.16.1.1 [14:19:36.258 EET Sat Apr 11 2020]
+Recent error sources:
+Number of control v2 message received: 0 Number of errors: 0 
+Recent sources:
+Recent error sources:
+ Permanent Port IP SLA Responder
+Permanent Port IP SLA Responder is: Enabled
+udpEcho Responder: 
+ IP Address Port
+ 172.16.1.1 5000
+
+
