@@ -1,0 +1,101 @@
+R3
+
+Router>enable
+Router#conf t
+Router(config)#hostname R3
+R3(config)#interface Lo3
+R3(config-if)#ip address 192.168.3.1 255.255.255.0
+R3(config-if)#exit
+
+R3(config)#interface s1/0
+R3(config-if)#ip address 172.16.13.3 255.255.255.248
+R3(config-if)#no shutdown
+R3(config-if)#exit
+
+R3(config)#interface s1/1
+R3(config-if)#ip address 172.16.23.3 255.255.255.248
+R3(config-if)#no shutdown
+R3(config-if)#exit
+
+R3(config)#interface s1/2
+R3(config-if)#ip address 172.16.34.3 255.255.255.248
+R3(config-if)#no shutdown
+R3(config-if)#exit
+
+R3(config)#router eigrp 100
+
+R3(config-router)#network 192.168.3.0
+R3(config-router)#network 172.16.13.0
+R3(config-router)#network 172.16.23.0
+R3(config-router)#network 172.16.34.0
+R3(config-router)#no auto-summary
+
+R3#sh ip eigrp neighbors
+
+EIGRP-IPv4 Neighbors for AS(100)
+H Address Interface Hold Uptime SRTT RTO Q Seq
+ (sec) (ms) Cnt Num
+2 172.16.34.4 Se1/2 14 00:03:09 15 100 0 3
+1 172.16.13.1 Se1/0 14 00:06:25 21 126 0 9
+0 172.16.23.2 Se1/1 13 00:06:25 20 120 0 9
+
+R3#sh ip route
+
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+ D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+ N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+ E1 - OSPF external type 1, E2 - OSPF external type 2
+ i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+ ia - IS-IS inter area, * - candidate default, U - per-user static route
+ o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+ a - application route
+ + - replicated route, % - next hop override
+Gateway of last resort is not set
+ 172.16.0.0/16 is variably subnetted, 7 subnets, 2 masks
+D 172.16.12.0/29 [90/2681856] via 172.16.23.2, 00:16:48, Serial1/1
+ [90/2681856] via 172.16.13.1, 00:16:48, Serial1/0
+C 172.16.13.0/29 is directly connected, Serial1/0
+L 172.16.13.3/32 is directly connected, Serial1/0
+C 172.16.23.0/29 is directly connected, Serial1/1
+L 172.16.23.3/32 is directly connected, Serial1/1
+C 172.16.34.0/29 is directly connected, Serial1/2
+L 172.16.34.3/32 is directly connected, Serial1/2
+D 192.168.1.0/24 [90/2297856] via 172.16.13.1, 00:16:48, Serial1/0
+D 192.168.2.0/24 [90/2297856] via 172.16.23.2, 00:16:48, Serial1/1
+ 192.168.3.0/24 is variably subnetted, 2 subnets, 2 masks
+C 192.168.3.0/24 is directly connected, Loopback3
+L 192.168.3.1/32 is directly connected, Loopback3
+ 192.168.4.0/25 is subnetted, 2 subnets
+D 192.168.4.0 [90/2297856] via 172.16.34.4, 00:13:32, Serial1/2
+D 192.168.4.128 [90/2297856] via 172.16.34.4, 00:13:32, Serial1/2
+
+R3(config)#ip access-list standard PBR-ACL
+
+R3(config-std-nacl)#remark ACL matches R4 LAN B traffic
+R3(config-std-nacl)#permit 192.168.4.128 0.0.0.127
+R3(config-std-nacl)#exit
+
+R3(config)#route-map R3-to-R1 permit
+
+R3(config-route-map)#match ip address PBR-ACL
+R3(config-route-map)#set ip next-hop 172.16.13.1
+R3(config-route-map)#end
+
+R3(config)#int s1/2
+
+R3(config-if)#ip policy route-map R3-to-R1
+R3(config-if)#exit
+
+R3#sh route-map
+
+route-map R3-to-R1, permit, sequence 10
+ Match clauses:
+ ip address (access-lists): PBR-ACL 
+ Set clauses:
+ ip next-hop 172.16.13.1
+ Policy routing matches: 0 packets, 0 bytes
+
+R3(config)#access-list 1 permit 192.168.4.0 0.0.0.255
+
+
+

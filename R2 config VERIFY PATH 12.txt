@@ -1,0 +1,36 @@
+R2
+
+Router>enable
+Router#conf t
+Router(config)#hostname R2
+R2(config)#interface Lo2
+R2(config-if)#ip address 192.168.2.1 255.255.255.0
+R2(config-if)#exit
+
+R2(config)#interface s1/0
+R2(config-if)#ip address 172.16.12.2 255.255.255.248
+R2(config-if)#no shutdown
+R2(config-if)#exit
+
+R2(config)#interface s1/1
+R2(config-if)#ip address 172.16.23.2 255.255.255.248
+R2(config-if)#no shutdown
+R2(config-if)#exit
+
+R2(config)#router eigrp 100
+
+R2(config-router)#network 192.168.2.0
+R2(config-router)#network 172.16.12.0
+R2(config-router)#network 172.16.23.0
+R2(config-router)#no auto-summary
+
+R2#sh ip eigrp neighbors
+
+EIGRP-IPv4 Neighbors for AS(100)
+H Address Interface Hold Uptime SRTT RTO Q Seq
+ (sec) (ms) Cnt Num
+1 172.16.23.3 Se1/1 12 00:05:23 12 100 0 11
+0 172.16.12.1 Se1/0 12 00:07:45 22 132 0 8
+
+
+

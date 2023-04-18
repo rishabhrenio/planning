@@ -1,0 +1,66 @@
+R4
+
+Router>enable
+Router#conf t
+Router(config)#hostname R4
+R4(config)#interface lo4
+R4(config-if)#ip address 192.168.4.1 255.255.255.128
+R4(config-if)#exit
+
+R4(config)#interface lo5 
+R4(config-if)#ip address 192.168.4.129 255.255.255.128
+R4(config-if)#exit
+
+R4(config)#interface s1/0
+R4(config-if)#ip address 172.16.34.4 255.255.255.248
+R4(config-if)#no shutdown
+R4(config-if)#exit
+
+R4(config)#router eigrp 100
+
+R4(config-router)#network 192.168.4.0
+R4(config-router)#network 172.16.34.0
+R4(config-router)#no auto-summary
+
+R4#sh ip eigrp neighbors
+
+EIGRP-IPv4 Neighbors for AS(100)
+H Address Interface Hold Uptime SRTT RTO Q Seq
+ (sec) (ms) Cnt Num
+0 172.16.34.3 Se1/0 14 00:04:07 25 150 0 9
+Before Route Maps
+
+R4#traceroute 192.168.1.1 source 192.168.4.1
+
+Type escape sequence to abort.
+Tracing the route to 192.168.1.1
+VRF info: (vrf in name/id, vrf out name/id)
+ 1 172.16.34.3 13 msec 11 msec 10 msec
+ 2 172.16.13.1 20 msec 17 msec *
+
+R4#traceroute 192.168.1.1 source 192.168.4.129
+
+Type escape sequence to abort.
+Tracing the route to 192.168.1.1
+VRF info: (vrf in name/id, vrf out name/id)
+ 1 172.16.34.3 15 msec 10 msec 10 msec
+ 2 172.16.13.1 19 msec 24 msec *
+After Route Maps
+
+R4#traceroute 192.168.1.1 source 192.168.4.1
+
+Type escape sequence to abort.
+Tracing the route to 192.168.1.1
+VRF info: (vrf in name/id, vrf out name/id)
+ 1 172.16.34.3 11 msec 10 msec 10 msec
+ 2 172.16.13.1 21 msec 22 msec * 
+
+R4#traceroute 192.168.1.1 source 192.168.4.129
+
+Type escape sequence to abort.
+Tracing the route to 192.168.1.1
+VRF info: (vrf in name/id, vrf out name/id)
+ 1 172.16.34.3 10 msec 10 msec 10 msec
+ 2 172.16.13.1 18 msec 18 msec *
+
+
