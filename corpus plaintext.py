@@ -2,6 +2,8 @@ import nltk
 from nltk.corpus import PlaintextCorpusReader
 
 corpus_root = 'C:\\Users\\renio\\OneDrive\\Desktop\\nlp'
+
+//idhr ek txt file create krna and usko ek folder mai save krna
 filelist = PlaintextCorpusReader(corpus_root, '.*')
 print ('\n File list: \n')
 print (filelist.fileids())
